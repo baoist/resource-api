@@ -1,2 +1,4 @@
 flask
 cherrypy
+alembic
+sqlalchemy

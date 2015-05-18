@@ -1,6 +1,7 @@
 flask
 cherrypy
 alembic
+psycopg2
 sqlalchemy
 flask-httpauth
 Flask-SQLAlchemy==1.0

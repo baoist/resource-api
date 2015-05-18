@@ -3,10 +3,7 @@
 # Based on Ubuntu
 ############################################################
 
-# Set the base image to Ubuntu
 FROM ubuntu
-
-# File Author / Maintainer
 MAINTAINER Brad Olson<iam@brad.io>
 
 # Add the application resources URL
@@ -19,10 +16,10 @@ RUN apt-get update
 RUN apt-get install -y tar git curl vim wget dialog net-tools build-essential
 
 # Install Python and Basic Python Tools
-RUN apt-get install -y python python-dev python-distribute python-pip
+RUN apt-get install -y python python-dev python-distribute python-pip python-psycopg2
 
 # Copy the application folder inside the container
-ADD /api /srv/app/api
+COPY /api /srv/app/api
 
 # Get pip to download and install requirements:
 RUN pip install -r /srv/app/api/requirements.txt

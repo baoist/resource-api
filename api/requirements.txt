@@ -2,3 +2,5 @@ flask
 cherrypy
 alembic
 sqlalchemy
+flask-httpauth
+Flask-SQLAlchemy==1.0

@@ -1,0 +1,3 @@
+debug = False
+PROPAGATE_EXCEPTIONS = True
+SECRET_KEY = "foobarbaz"

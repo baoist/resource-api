@@ -1,5 +1,4 @@
 # Project Setup
-# _____________
 
 ```
 docker-compose build

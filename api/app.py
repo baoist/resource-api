@@ -3,6 +3,8 @@ from flask import g, request, redirect, url_for, Flask
 from flask.ext.httpauth import HTTPBasicAuth
 from models.user import db, User
 
+import config
+
 app = Flask(__name__)
 auth = HTTPBasicAuth()
 db.init_app(app)

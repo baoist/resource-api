@@ -1,4 +1,8 @@
+# Project Setup
+# _____________
+
 ```
-docker build -t resource-api .
-docker run -name resouce-api-instance -p 5000:5000 -i -t --rm -v $(pwd)/api:/srv/app/api resource-api
+docker-compose build
+docker-compose run postgres createdb resource-api
+docker-compose run web alembic upgrade head
 ```

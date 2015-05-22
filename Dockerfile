@@ -34,3 +34,5 @@ WORKDIR /srv/app/api
 # when creating a new container
 # i.e. using CherryPy to serve the application
 CMD python server.py
+# using Flask
+#CMD python app.py

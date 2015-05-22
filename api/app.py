@@ -6,6 +6,7 @@ from models.user import db, User
 import config
 
 app = Flask(__name__)
+app.config.from_object('config.DevelopmentConfig')
 auth = HTTPBasicAuth()
 db.init_app(app)
 
@@ -15,7 +16,6 @@ def require_apikey(f):
         return f(*args, **kwargs)
     return require_key
 
-@auth.verify_password
 def verify_password(username_or_token, password):
     # first try to authenticate by token
     user = User.verify_auth_token(username_or_token)
@@ -28,11 +28,11 @@ def verify_password(username_or_token, password):
     return True
 
 @app.route("/api/log-in", methods=["POST"])
+@auth.verify_password
 def login():
     auth = request.authorization
-    verified = verify_password(auth.username, auth.password)
 
-    return "foo"
+    return "Hello, %s!" % auth.username
 
 @app.route("/")
 def hello():

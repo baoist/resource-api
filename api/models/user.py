@@ -6,7 +6,6 @@ from sqlalchemy import Column, types
 from itsdangerous import (TimedJSONWebSignatureSerializer
                           as Serializer, BadSignature, SignatureExpired)
 
-import app
 import config
 
 db = SQLAlchemy()
@@ -36,6 +35,8 @@ class User(db.Model, DictSerializableMixin):
         self.updated_at = datetime.utcnow()
 
     def generate_auth_token(self, expiration=600):
+        #s = Serializer(config.SECRET_KEY, expires_in=expiration)
+        #return s.dumps({'id': self.id})
         return "foo"
 
     def get_id(self):

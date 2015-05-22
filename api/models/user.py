@@ -5,7 +5,7 @@ from sqlalchemy import Column, types
 from itsdangerous import (TimedJSONWebSignatureSerializer
                           as Serializer, BadSignature, SignatureExpired)
 
-import settings
+import config
 
 db = SQLAlchemy()
 

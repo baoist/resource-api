@@ -24,7 +24,7 @@ target_metadata = None
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
 
-config.set_main_option("db_uri", app.config.Config.DB_URI)
+config.set_main_option("db_uri", app.config.Config.SQLALCHEMY_DATABASE_URI)
 print config.get_main_option("db_uri")
 
 def run_migrations_offline():

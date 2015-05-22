@@ -22,6 +22,9 @@ def upgrade():
         sa.Column('id', sa.Integer, primary_key=True),
         sa.Column('username', sa.String(50), nullable=False),
         sa.Column('auth_token', sa.String(50), nullable=False),
+        sa.Column('password', sa.String(50), nullable=False),
+        sa.Column('created_at', sa.DateTime(), nullable=False),
+        sa.Column('updated_at', sa.DateTime()),
     )
 
 

@@ -3,11 +3,12 @@ from flask import g, request, redirect, url_for, Flask
 from flask.ext.httpauth import HTTPBasicAuth
 from models.user import db, User
 
+from authentication.verification import authenticate
 import config
 
 app = Flask(__name__)
 app.config.from_object('config.DevelopmentConfig')
-auth = HTTPBasicAuth()
+app.auth = HTTPBasicAuth()
 db.init_app(app)
 
 def require_apikey(f):
@@ -27,16 +28,28 @@ def verify_password(username_or_token, password):
     g.user = user
     return True
 
+@app.route("/api/users/create", methods=["POST"])
+def create_user():
+    auth = request.authorization
+    user = User(auth.username, auth.password)
+
+    db.session.add(user)
+    db.session.commit()
+
+    return "test"
+
 @app.route("/api/log-in", methods=["POST"])
-@auth.verify_password
+@app.auth.verify_password
 def login():
     auth = request.authorization
 
-    return "Hello, %s!" % auth.username
+    user = authenticate(auth.username, auth.password)
+
+    return "Hello, %s!" % user
 
 @app.route("/")
 def hello():
-    return "Hello World!"
+    return "test"
 
 @app.route("/foo")
 def foo():

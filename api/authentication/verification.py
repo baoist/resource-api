@@ -3,7 +3,7 @@ from flask.ext.httpauth import HTTPBasicAuth
 from models.user import db, User
 
 class Authenticator():
-    def __init__(self, username_or_token, password):
+    def __init__(self, username_or_token, password=None):
         self.username = self.token = username_or_token
         self.password = password
 

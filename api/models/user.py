@@ -57,4 +57,4 @@ class User(db.Model, DictSerializableMixin):
         return user
 
     def verify_password(self, password):
-        return True
+        return pwd_context.verify(password, self.password)

@@ -5,6 +5,7 @@ from collections import OrderedDict
 from sqlalchemy import Column, types
 from itsdangerous import (TimedJSONWebSignatureSerializer
                           as URLSafeSerializer, BadSignature, SignatureExpired)
+from passlib.apps import custom_app_context as pwd_context
 
 import app
 
@@ -29,7 +30,7 @@ class User(db.Model, DictSerializableMixin):
 
     def __init__(self, username, password):
         self.username = username
-        self.password = password
+        self.password = self.hash_password(password)
         self.auth_token = self.generate_auth_token()
         self.created_at = datetime.utcnow()
         self.updated_at = datetime.utcnow()
@@ -41,14 +42,19 @@ class User(db.Model, DictSerializableMixin):
     def get_id(self):
         return unicode(self.id)
 
-    @staticmethod
-    def verify_auth_token(token):
-        s = Serializer(config.SECRET_KEY)
+    def hash_password(self, password):
+        return pwd_context.encrypt(password)
+
+    def verify_auth_token(self, token):
+        s = URLSafeSerializer(app.config.Config.SECRET_KEY)
         try:
             data = s.loads(token)
         except SignatureExpired:
-            return None    # valid token, but expired
+            return None
         except BadSignature:
-            return None    # invalid token
+            return None
         user = User.query.get(data['id'])
         return user
+
+    def verify_password(self, password):
+        return True

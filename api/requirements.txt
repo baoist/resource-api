@@ -3,6 +3,7 @@ cherrypy
 alembic
 psycopg2
 itsdangerous
+passlib
 sqlalchemy
 flask-httpauth
 Flask-SQLAlchemy==1.0

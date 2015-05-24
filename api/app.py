@@ -1,9 +1,10 @@
 from functools import wraps
-from flask import g, request, redirect, url_for, Flask
+from flask import (g, request, redirect,
+                  url_for, Flask, jsonify)
 from flask.ext.httpauth import HTTPBasicAuth
 from models.user import db, User
+from authentication.verification import Authenticator
 
-from authentication.verification import authenticate
 import config
 
 app = Flask(__name__)
@@ -16,17 +17,6 @@ def require_apikey(f):
     def require_key(*args, **kwargs):
         return f(*args, **kwargs)
     return require_key
-
-def verify_password(username_or_token, password):
-    # first try to authenticate by token
-    user = User.verify_auth_token(username_or_token)
-    if not user:
-        # try to authenticate with username/password
-        user = User.query.filter_by(username = username_or_token).first()
-        if not user or not user.verify_password(password):
-            return False
-    g.user = user
-    return True
 
 @app.route("/api/users/create", methods=["POST"])
 def create_user():
@@ -43,9 +33,15 @@ def create_user():
 def login():
     auth = request.authorization
 
-    user = authenticate(auth.username, auth.password)
+    authenticator = Authenticator(auth.username, auth.password)
+    user = authenticator.authenticate()
 
-    return "Hello, %s!" % user
+    if not user:
+        return False
+
+    g.user = user
+    return jsonify(user = user._asdict())
+    #return "Hello, %s!" % user.authentication_token
 
 @app.route("/")
 def hello():

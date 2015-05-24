@@ -4,9 +4,9 @@ from sqlalchemy.orm import relationship
 from collections import OrderedDict
 from sqlalchemy import Column, types
 from itsdangerous import (TimedJSONWebSignatureSerializer
-                          as Serializer, BadSignature, SignatureExpired)
+                          as URLSafeSerializer, BadSignature, SignatureExpired)
 
-import config
+import app
 
 db = SQLAlchemy()
 
@@ -21,9 +21,9 @@ class User(db.Model, DictSerializableMixin):
     __tablename__ = 'users'
 
     id = Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(32), index=True)
-    password = db.Column(db.String(50))
-    auth_token = db.Column(db.String(32), index=True)
+    username = db.Column(db.String(255), index=True)
+    password = db.Column(db.String(255))
+    auth_token = db.Column(db.String(255), index=True)
     created_at = db.Column(db.DateTime)
     updated_at = db.Column(db.DateTime)
 
@@ -35,9 +35,8 @@ class User(db.Model, DictSerializableMixin):
         self.updated_at = datetime.utcnow()
 
     def generate_auth_token(self, expiration=600):
-        #s = Serializer(config.SECRET_KEY, expires_in=expiration)
-        #return s.dumps({'id': self.id})
-        return "foo"
+        s = URLSafeSerializer(app.config.Config.SECRET_KEY, expires_in=expiration)
+        return s.dumps({'id': self.id})
 
     def get_id(self):
         return unicode(self.id)

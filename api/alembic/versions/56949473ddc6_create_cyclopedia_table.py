@@ -25,7 +25,7 @@ def upgrade():
         sa.Column('title', sa.String(255), nullable=False),
         sa.Column('image_url', sa.String(255), nullable=True),
         sa.Column('description', sa.Text(), nullable=True),
-        sa.Column('parent_cyclopedia_id', sa.Integer, sa.ForeignKey('cyclopedias.id')),
+        sa.Column('parent_cyclopedia_id', sa.Integer, sa.ForeignKey('cyclopedias.id'), nullable=True),
         sa.Column('created_at', sa.DateTime(), nullable=False),
         sa.Column('updated_at', sa.DateTime()),
     )

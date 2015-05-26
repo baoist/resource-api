@@ -2,7 +2,9 @@ from functools import wraps
 from flask import (g, request, Response, redirect,
                   url_for, Flask, jsonify)
 from flask.ext.httpauth import HTTPBasicAuth
-from models.user import db, User
+from models.base import db
+from models.user import User
+from models.cyclopedia import Cyclopedia
 from authentication.verification import Authenticator
 
 import config

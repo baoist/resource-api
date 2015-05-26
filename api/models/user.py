@@ -1,22 +1,13 @@
 from flask.ext.sqlalchemy import SQLAlchemy
 from datetime import datetime
-from sqlalchemy.orm import relationship
-from collections import OrderedDict
 from sqlalchemy import Column, types
 from itsdangerous import (TimedJSONWebSignatureSerializer
                           as URLSafeSerializer, BadSignature, SignatureExpired)
 from passlib.apps import custom_app_context as pwd_context
+from models.mixins.dict_serializable_mixin import DictSerializableMixin
+from base import db
 
 import app
-
-db = SQLAlchemy()
-
-class DictSerializableMixin(object):
-    def _asdict(self):
-        result = OrderedDict()
-        for key in self.__mapper__.c.keys():
-            result[key] = getattr(self, key)
-        return result
 
 class User(db.Model, DictSerializableMixin):
     __tablename__ = 'users'

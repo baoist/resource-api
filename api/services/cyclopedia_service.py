@@ -4,7 +4,7 @@ from models.cyclopedia import Cyclopedia
 from models.user import User
 
 
-class CyclopediaService():
+class CyclopediaService(object):
     def init():
         pass
 

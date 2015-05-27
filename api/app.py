@@ -69,7 +69,6 @@ def create_cyclopedia():
 
     if cyclopedia_params['topic']:
         cyclopedia_service = CyclopediaService()
-
         cyclopedia = cyclopedia_service.create(cyclopedia_params['topic'], g.user)
 
         if cyclopedia:

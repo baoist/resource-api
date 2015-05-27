@@ -1,7 +1,6 @@
 from sqlalchemy import and_
 from models.base import db
 from models.cyclopedia import Cyclopedia
-from models.user import User
 
 
 class CyclopediaService(object):
@@ -43,3 +42,11 @@ class CyclopediaService(object):
         nearest_topic_id = getattr(parents[-1], 'id', None)
 
         return nearest_topic_id
+
+    def get_root_cyclopedias(self, user_id):
+        cyclopedias = db.session.query(Cyclopedia).filter(and_(
+            Cyclopedia.user_id == user_id,
+            Cyclopedia.parent_cyclopedia_id == None,
+        ))
+
+        return cyclopedias

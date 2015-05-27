@@ -7,6 +7,7 @@ from models.user import User
 from models.cyclopedia import Cyclopedia
 from models.entry import Entry
 from services.cyclopedia_service import CyclopediaService
+from presenters.cyclopedia_presenter import CyclopediaPresenter
 from authentication.verification import Authenticator
 
 import config
@@ -16,7 +17,9 @@ app.config.from_object('config.DevelopmentConfig')
 app.auth = HTTPBasicAuth()
 db.init_app(app)
 
+
 def require_apikey(fn):
+    @wraps(fn)
     def _wrap(*args, **kwargs):
         auth = request.authorization
         authenticator = Authenticator(auth.username)
@@ -74,11 +77,34 @@ def create_cyclopedia():
                                                cyclopedia_params.get('parents', ""))
 
         if cyclopedia:
+            presenter = CyclopediaPresenter()
+            presenter.dump(cyclopedia)
+
             return jsonify(cyclopedia = cyclopedia._asdict())
 
     return Response(response='400 Unable to create cyclopedia.',
                     status=400,
                     mimetype="application/json")
+
+
+@app.route("/api/cyclopedias", methods=["GET"])
+@require_apikey
+def get_cyclopedia():
+    cyclopedia_params = request.get_json(force=True)
+
+    cyclopedia_service = CyclopediaService()
+
+    if cyclopedia_params.get('topics', False):
+        return Response(response='400 Unable to create cyclopedia.',
+                    status=400,
+                    mimetype="application/json")
+    else:
+        cyclopedias = cyclopedia_service.get_root_cyclopedias(g.user.id)
+
+        cyclopedias_presenter = CyclopediaPresenter(many=True)
+        cyclopedias_result = cyclopedias_presenter.dump(cyclopedias)
+
+        return jsonify(cyclopedias = cyclopedias_result.data)
 
 
 if __name__ == "__main__":

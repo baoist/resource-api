@@ -65,11 +65,13 @@ def login():
 @app.route("/api/cyclopedias/create", methods=["POST"])
 @require_apikey
 def create_cyclopedia():
-    cyclopedia_params = request.get_json()
+    cyclopedia_params = request.get_json(force=True)
 
-    if cyclopedia_params['topic']:
+    if cyclopedia_params.get('topic', False):
         cyclopedia_service = CyclopediaService()
-        cyclopedia = cyclopedia_service.create(cyclopedia_params['topic'], g.user)
+        cyclopedia = cyclopedia_service.create(cyclopedia_params.get('topic'),
+                                               g.user,
+                                               cyclopedia_params.get('parents', ""))
 
         if cyclopedia:
             return jsonify(cyclopedia = cyclopedia._asdict())

@@ -10,7 +10,7 @@ class Entry(db.Model, DictSerializableMixin):
     __tablename__ = 'entries'
 
     id = Column(db.Integer, primary_key=True)
-    topic = db.Column(db.String(255), index=True)
+    term = db.Column(db.String(255), index=True)
     title = db.Column(db.String(255))
     cyclopedia_id = db.Column(db.Integer, ForeignKey('cyclopedia.id'))
     image_url = db.Column(db.String(255))
@@ -18,8 +18,8 @@ class Entry(db.Model, DictSerializableMixin):
     created_at = db.Column(db.DateTime)
     updated_at = db.Column(db.DateTime)
 
-    def __init__(self, topic, title, cyclopedia_id, image_url=None, description=None):
-        self.topic = topic
+    def __init__(self, term, title, cyclopedia_id, image_url=None, description=None):
+        self.term = term
         self.title = title
         self.cyclopedia_id = cyclopedia_id
         self.image_url = image_url

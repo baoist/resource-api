@@ -1,10 +1,12 @@
 from functools import wraps
 from flask import (g, request, Response, redirect,
-                  url_for, Flask, jsonify)
+                  url_for, Flask, jsonify, json)
 from flask.ext.httpauth import HTTPBasicAuth
 from models.base import db
 from models.user import User
 from models.cyclopedia import Cyclopedia
+from models.entry import Entry
+from services.cyclopedia_service import CyclopediaService
 from authentication.verification import Authenticator
 
 import config
@@ -29,15 +31,20 @@ def require_apikey(fn):
         return fn(*args, **kwargs)
     return _wrap
 
+
 @app.route("/api/users/create", methods=["POST"])
 def create_user():
     auth = request.authorization
     user = User(auth.username, auth.password)
 
     db.session.add(user)
-    db.session.commit()
+    if db.session.commit():
+        return jsonify(user = user._asdict())
+    else:
+        return Response(response='400 Unable to create user.',
+                        status=400,
+                        mimetype="application/json")
 
-    return "test"
 
 @app.route("/api/log-in", methods=["POST"])
 def login():
@@ -46,31 +53,32 @@ def login():
     authenticator = Authenticator(auth.username, auth.password)
     user = authenticator.authenticate()
 
-    if not user:
+    if user:
+        g.user = user
+        return jsonify(user = user._asdict())
+    else:
         return Response(response='401 Unauthorized.',
                         status=401,
                         mimetype="application/json")
 
-    g.user = user
-    return jsonify(user = user._asdict())
 
-@app.route("/")
-def hello():
-    return "test"
-
-@app.route("/foo")
+@app.route("/api/cyclopedias/create", methods=["POST"])
 @require_apikey
-def foo():
-    return "Goodbye, %s!" % g.user.password
+def create_cyclopedia():
+    cyclopedia_params = request.get_json()
 
+    if cyclopedia_params['topic']:
+        cyclopedia_service = CyclopediaService()
 
-@app.route("/bar")
-def bar():
-    return "Goodbye World!"
+        cyclopedia = cyclopedia_service.create(cyclopedia_params['topic'], g.user)
 
-@app.route("/wib")
-def wib():
-    return "Goodbye World!"
+        if cyclopedia:
+            return jsonify(cyclopedia = cyclopedia._asdict())
+
+    return Response(response='400 Unable to create cyclopedia.',
+                    status=400,
+                    mimetype="application/json")
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True)

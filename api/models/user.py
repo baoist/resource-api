@@ -19,6 +19,7 @@ class User(db.Model, DictSerializableMixin):
     created_at = db.Column(db.DateTime)
     updated_at = db.Column(db.DateTime)
 
+
     def __init__(self, username, password):
         self.username = username
         self.password = self.hash_password(password)
@@ -26,15 +27,19 @@ class User(db.Model, DictSerializableMixin):
         self.created_at = datetime.utcnow()
         self.updated_at = datetime.utcnow()
 
+
     def generate_auth_token(self, expiration=600):
         s = URLSafeSerializer(app.config.Config.SECRET_KEY, expires_in=expiration)
         return s.dumps({'id': self.id})
 
+
     def get_id(self):
         return unicode(self.id)
 
+
     def hash_password(self, password):
         return pwd_context.encrypt(password)
+
 
     def verify_auth_token(self, token):
         s = URLSafeSerializer(app.config.Config.SECRET_KEY)
@@ -46,6 +51,7 @@ class User(db.Model, DictSerializableMixin):
             return None
         user = User.query.get(data['id'])
         return user
+
 
     def verify_password(self, password):
         return pwd_context.verify(password, self.password)

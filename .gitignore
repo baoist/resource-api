@@ -1,4 +1,5 @@
 .env
 
+*.pyc
+
 api/config.py
-api/config.pyc

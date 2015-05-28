@@ -94,10 +94,14 @@ def get_cyclopedia():
 
     cyclopedia_service = CyclopediaService()
 
-    if cyclopedia_params.get('topics', False):
-        return Response(response='400 Unable to create cyclopedia.',
-                    status=400,
-                    mimetype="application/json")
+    if cyclopedia_params.get('parents', False):
+        parent_topic_id = cyclopedia_service.get_immediate_parent(cyclopedia_params.get('parents'))
+        cyclopedia = cyclopedia_service.find(parent_topic_id)
+
+        cyclopedias_presenter = CyclopediaPresenter()
+        cyclopedias_result = cyclopedias_presenter.dump(cyclopedia)
+
+        return jsonify(cyclopedia = cyclopedias_result.data)
     else:
         cyclopedias = cyclopedia_service.get_root_cyclopedias(g.user.id)
 

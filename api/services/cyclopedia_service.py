@@ -23,6 +23,12 @@ class CyclopediaService(object):
         return cyclopedia
 
 
+    def find(self, id):
+        cyclopedia = Cyclopedia.query.filter_by(id = id).first()
+
+        return cyclopedia
+
+
     def topics_at_level(self, topic, user_id, id=None, parent_cyclopedia_id=None):
         cyclopedias = db.session.query(Cyclopedia).filter(and_(
             Cyclopedia.topic == topic,

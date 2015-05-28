@@ -7,6 +7,8 @@ from models.user import User
 from models.cyclopedia import Cyclopedia
 from models.entry import Entry
 from services.cyclopedia_service import CyclopediaService
+from services.user_service import UserService
+from presenters.user_presenter import UserPresenter
 from presenters.cyclopedia_presenter import CyclopediaPresenter
 from authentication.verification import Authenticator
 
@@ -38,15 +40,24 @@ def require_apikey(fn):
 @app.route("/api/users/create", methods=["POST"])
 def create_user():
     auth = request.authorization
-    user = User(auth.username, auth.password)
 
-    db.session.add(user)
-    if db.session.commit():
-        return jsonify(user = user._asdict())
-    else:
-        return Response(response='400 Unable to create user.',
+    user_service = UserService()
+    user = user_service.find_by('username', auth.username)
+
+    if user:
+        return Response(response='400 Unable to create user. User already exists.',
                         status=400,
                         mimetype="application/json")
+
+    new_user = User(auth.username, auth.password)
+
+    db.session.add(new_user)
+    committed = db.session.commit()
+
+    user_presenter = UserPresenter()
+    user_result = user_presenter.dump(new_user)
+
+    return jsonify(user = user_result.data)
 
 
 @app.route("/api/log-in", methods=["POST"])
@@ -58,7 +69,11 @@ def login():
 
     if user:
         g.user = user
-        return jsonify(user = user._asdict())
+
+        user_presenter = UserPresenter()
+        user_result = user_presenter.dump(user)
+
+        return jsonify(user = user_result.data)
     else:
         return Response(response='401 Unauthorized.',
                         status=401,

@@ -8,9 +8,9 @@ from models.cyclopedia import Cyclopedia
 from models.entry import Entry
 from services.cyclopedia_service import CyclopediaService
 from services.user_service import UserService
+from services.authentication_service import AuthenticationService
 from presenters.user_presenter import UserPresenter
 from presenters.cyclopedia_presenter import CyclopediaPresenter
-from authentication.verification import Authenticator
 
 import config
 
@@ -24,7 +24,7 @@ def require_apikey(fn):
     @wraps(fn)
     def _wrap(*args, **kwargs):
         auth = request.authorization
-        authenticator = Authenticator(auth.username)
+        authenticator = AuthenticationService(auth.username)
         user = authenticator.authenticate()
 
         if not auth.username or not user:
@@ -60,7 +60,7 @@ def create_user():
 def login():
     auth = request.authorization
 
-    authenticator = Authenticator(auth.username, auth.password)
+    authenticator = AuthenticationService(auth.username, auth.password)
     user = authenticator.authenticate()
 
     if user:

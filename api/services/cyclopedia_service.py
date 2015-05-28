@@ -9,6 +9,17 @@ class CyclopediaService(object):
 
 
     def create(self, topic, user, nodes=None):
+        '''
+        Attempt to create a record
+
+        Returns record if successful,
+        otherwise returns False
+
+        Receives a `topic` (required), `user` (required), `nodes` (optional)
+
+        Record will be created as a child of the last node if passed,
+        otherwise it will be at the root
+        '''
         parent_node_id = self.get_parent_node_id(nodes)
         if nodes and not parent_node_id:
             return False
@@ -26,6 +37,9 @@ class CyclopediaService(object):
 
 
     def find(self, id):
+        '''
+        Retrieve a single record given `id`
+        '''
         cyclopedia = Cyclopedia.query.filter_by(id = id).first()
 
         return cyclopedia
@@ -33,7 +47,7 @@ class CyclopediaService(object):
 
     def topics_at_level(self, topic, user_id, id=None, node_id=None):
         '''
-        Retrieves all cyclopedias given
+        Retrieves all records given
         topic, user_id, id (optional), node_id (optional)
         '''
         cyclopedias = db.session.query(Cyclopedia).filter(and_(
@@ -47,13 +61,17 @@ class CyclopediaService(object):
 
 
     def get_parent_node_id(self, node_topics=None):
+        '''
+        Retreive the id of the last record in a path
+        given a path of `topics`
+        '''
         nearest_topic = self.get_parent_node(node_topics)
 
         return getattr(nearest_topic, 'id', None)
 
     def get_parent_node(self, node_topics=None):
         '''
-        Retreives all parent nodes and returns the last node's id
+        Retreive all node records in a path
         '''
         if not node_topics:
             return None
@@ -76,6 +94,9 @@ class CyclopediaService(object):
 
 
     def get_root_cyclopedias(self, user_id):
+        '''
+        Retreive all root nodes
+        '''
         cyclopedias = db.session.query(Cyclopedia).filter(and_(
             Cyclopedia.user_id == user_id,
             Cyclopedia.node_cyclopedia_id == None,

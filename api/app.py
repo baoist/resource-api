@@ -118,7 +118,7 @@ def get_cyclopedia():
     Receives `path` (optional, array).
 
     Retrieves the tree of cyclopedias and entries.
-    If a `path` is passed the tree is returned from that path.
+    If a `path` is passed the subtree beginning at that descendent.
     '''
     cyclopedia_params = request.get_json(force=True)
 

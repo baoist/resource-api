@@ -48,7 +48,7 @@ def create_user():
         user_presenter = UserPresenter()
         user_result = user_presenter.dump(created_user)
 
-        return jsonify(user = user_result.data)
+        return jsonify(user_result.data)
 
 
     return Response(response='400 Unable to create user. User already exists.',
@@ -69,7 +69,7 @@ def login():
         user_presenter = UserPresenter()
         user_result = user_presenter.dump(user)
 
-        return jsonify(user = user_result.data)
+        return jsonify(user_result.data)
     else:
         return Response(response='401 Unauthorized.',
                         status=401,
@@ -88,10 +88,10 @@ def create_cyclopedia():
                                                cyclopedia_params.get('parents', ""))
 
         if cyclopedia:
-            presenter = CyclopediaPresenter()
-            presenter.dump(cyclopedia)
+            cyclopedia_presenter = CyclopediaPresenter()
+            cyclopedia_result = cyclopedia_presenter.dump(cyclopedia)
 
-            return jsonify(cyclopedia = cyclopedia._asdict())
+            return jsonify(cyclopedia_result.data)
 
     return Response(response='400 Unable to create cyclopedia.',
                     status=400,
@@ -112,14 +112,14 @@ def get_cyclopedia():
         cyclopedias_presenter = CyclopediaPresenter()
         cyclopedias_result = cyclopedias_presenter.dump(cyclopedia)
 
-        return jsonify(cyclopedia = cyclopedias_result.data)
+        return jsonify(cyclopedias_result.data)
     else:
         cyclopedias = cyclopedia_service.get_root_cyclopedias(g.user.id)
 
         cyclopedias_presenter = CyclopediaPresenter(many=True)
         cyclopedias_result = cyclopedias_presenter.dump(cyclopedias)
 
-        return jsonify(cyclopedias = cyclopedias_result.data)
+        return jsonify(cyclopedias_result.data)
 
 
 if __name__ == "__main__":

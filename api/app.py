@@ -40,7 +40,7 @@ def require_apikey(fn):
 @app.route("/api/users/create", methods=["POST"])
 def create_user():
     '''
-    Takes a username:password and attempts to create a user.
+    Receives a username:password (required) and attempts to create a user.
 
     Username is a unique field.
     '''
@@ -64,7 +64,7 @@ def create_user():
 @app.route("/api/log-in", methods=["POST"])
 def login():
     '''
-    Takes a username:password and attempts to log in.
+    Receives a username:password and attempts to log in.
     '''
     auth = request.authorization
 
@@ -88,7 +88,7 @@ def login():
 @require_apikey
 def create_cyclopedia():
     '''
-    Takes a `topic` (required), `path` (optional).
+    Receives a `topic` (required), `path` (optional).
 
     Attempts to create a cyclopedia.
     '''
@@ -115,16 +115,17 @@ def create_cyclopedia():
 @require_apikey
 def get_cyclopedia():
     '''
-    Takes optional `path`
+    Receives `path` (optional, array).
 
     Retrieves the tree of cyclopedias and entries.
+    If a `path` is passed the tree is returned from that path.
     '''
     cyclopedia_params = request.get_json(force=True)
 
     cyclopedia_service = CyclopediaService()
 
     if cyclopedia_params.get('path', False):
-        node_topic_id = cyclopedia_service.get_parent_node(cyclopedia_params.get('path'))
+        node_topic_id = cyclopedia_service.get_parent_node_id(cyclopedia_params.get('path'))
         cyclopedia = cyclopedia_service.find(node_topic_id)
 
         cyclopedias_presenter = CyclopediaPresenter()

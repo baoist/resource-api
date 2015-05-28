@@ -42,22 +42,18 @@ def create_user():
     auth = request.authorization
 
     user_service = UserService()
-    user = user_service.find_by('username', auth.username)
+    created_user = user_service.create(auth.username, auth.password)
 
-    if user:
-        return Response(response='400 Unable to create user. User already exists.',
-                        status=400,
-                        mimetype="application/json")
+    if created_user:
+        user_presenter = UserPresenter()
+        user_result = user_presenter.dump(created_user)
 
-    new_user = User(auth.username, auth.password)
+        return jsonify(user = user_result.data)
 
-    db.session.add(new_user)
-    committed = db.session.commit()
 
-    user_presenter = UserPresenter()
-    user_result = user_presenter.dump(new_user)
-
-    return jsonify(user = user_result.data)
+    return Response(response='400 Unable to create user. User already exists.',
+                    status=400,
+                    mimetype="application/json")
 
 
 @app.route("/api/log-in", methods=["POST"])

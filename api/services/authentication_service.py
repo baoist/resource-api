@@ -12,14 +12,17 @@ class AuthenticationService():
         else:
             self.method = "authenticate_with_token"
 
+
     def authenticate(self):
         return getattr(self, self.method)()
+
 
     def authenticate_with_password(self):
         user = User.query.filter_by(username = self.username).first()
         if not user or not user.verify_password(self.password):
             return False
         return user
+
 
     def authenticate_with_token(self):
         user = User.query.filter_by(auth_token = self.token).first()

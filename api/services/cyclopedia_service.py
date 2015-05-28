@@ -8,14 +8,14 @@ class CyclopediaService(object):
         pass
 
 
-    def create(self, topic, user, parent_cyclopedias=None):
-        parent_topic_id = self.get_immediate_parent(parent_cyclopedias)
+    def create(self, topic, user, nodes=None):
+        parent_node_id = self.get_parent_node(nodes)
 
-        topics_at_level = self.topics_at_level(topic, user.id, None, parent_topic_id).count()
+        topics_at_level = self.topics_at_level(topic, user.id, None, parent_node_id).count()
         if topics_at_level > 0:
             return False
 
-        cyclopedia = Cyclopedia(topic, user.id, parent_topic_id)
+        cyclopedia = Cyclopedia(topic, user.id, parent_node_id)
 
         db.session.add(cyclopedia)
         db.session.commit()
@@ -29,30 +29,31 @@ class CyclopediaService(object):
         return cyclopedia
 
 
-    def topics_at_level(self, topic, user_id, id=None, parent_cyclopedia_id=None):
+    def topics_at_level(self, topic, user_id, id=None, node_id=None):
         cyclopedias = db.session.query(Cyclopedia).filter(and_(
             Cyclopedia.topic == topic,
             Cyclopedia.user_id == user_id,
             Cyclopedia.id != id,
-            Cyclopedia.parent_cyclopedia_id == parent_cyclopedia_id,
+            Cyclopedia.parent_cyclopedia_id == node_id,
         ))
 
         return cyclopedias
 
 
-    def get_immediate_parent(self, parent_topics=None):
-        if not parent_topics:
+    def get_parent_node(self, node_topics=None):
+        if not node_topics:
             return None
 
-        parents = [Cyclopedia.query.filter_by(topic = parent).first() for parent in parent_topics]
-        nearest_topic_id = getattr(parents[-1], 'id', None)
+        nodes = [Cyclopedia.query.filter_by(topic = node).first() for node in node_topics]
+        nearest_topic_id = getattr(nodes[-1], 'id', None)
 
         return nearest_topic_id
+
 
     def get_root_cyclopedias(self, user_id):
         cyclopedias = db.session.query(Cyclopedia).filter(and_(
             Cyclopedia.user_id == user_id,
-            Cyclopedia.parent_cyclopedia_id == None,
+            Cyclopedia.node_cyclopedia_id == None,
         ))
 
         return cyclopedias

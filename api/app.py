@@ -39,6 +39,11 @@ def require_apikey(fn):
 
 @app.route("/api/users/create", methods=["POST"])
 def create_user():
+    '''
+    Takes a username:password and attempts to create a user.
+
+    Username is a unique field.
+    '''
     auth = request.authorization
 
     user_service = UserService()
@@ -58,6 +63,9 @@ def create_user():
 
 @app.route("/api/log-in", methods=["POST"])
 def login():
+    '''
+    Takes a username:password and attempts to log in.
+    '''
     auth = request.authorization
 
     authenticator = AuthenticationService(auth.username, auth.password)
@@ -79,13 +87,18 @@ def login():
 @app.route("/api/cyclopedias/create", methods=["POST"])
 @require_apikey
 def create_cyclopedia():
+    '''
+    Takes a `topic` (required), `path` (optional).
+
+    Attempts to create a cyclopedia.
+    '''
     cyclopedia_params = request.get_json(force=True)
 
     if cyclopedia_params.get('topic', False):
         cyclopedia_service = CyclopediaService()
         cyclopedia = cyclopedia_service.create(cyclopedia_params.get('topic'),
                                                g.user,
-                                               cyclopedia_params.get('parents', ""))
+                                               cyclopedia_params.get('path', ""))
 
         if cyclopedia:
             cyclopedia_presenter = CyclopediaPresenter()
@@ -101,13 +114,18 @@ def create_cyclopedia():
 @app.route("/api/cyclopedias", methods=["GET"])
 @require_apikey
 def get_cyclopedia():
+    '''
+    Takes optional `path`
+
+    Retrieves the tree of cyclopedias and entries.
+    '''
     cyclopedia_params = request.get_json(force=True)
 
     cyclopedia_service = CyclopediaService()
 
-    if cyclopedia_params.get('parents', False):
-        parent_topic_id = cyclopedia_service.get_immediate_parent(cyclopedia_params.get('parents'))
-        cyclopedia = cyclopedia_service.find(parent_topic_id)
+    if cyclopedia_params.get('path', False):
+        node_topic_id = cyclopedia_service.get_parent_node(cyclopedia_params.get('path'))
+        cyclopedia = cyclopedia_service.find(node_topic_id)
 
         cyclopedias_presenter = CyclopediaPresenter()
         cyclopedias_result = cyclopedias_presenter.dump(cyclopedia)

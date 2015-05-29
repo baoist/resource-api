@@ -22,10 +22,21 @@ app.auth = HTTPBasicAuth()
 db.init_app(app)
 
 
+def authenticate():
+    """Sends a 401 response that enables basic auth"""
+    return Response('Could not verify your access level for that URL.\n'
+                    'You have to login with proper credentials', 401,
+                    {'WWW-Authenticate': 'Basic realm="Login Required"'})
+
+
 def require_apikey(fn):
     @wraps(fn)
     def _wrap(*args, **kwargs):
         auth = request.authorization
+
+        if not auth:
+            return authenticate()
+
         authenticator = AuthenticationService(auth.username)
         user = authenticator.authenticate()
 

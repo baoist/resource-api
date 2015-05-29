@@ -115,6 +115,7 @@ def create_cyclopedia():
                     mimetype="application/json")
 
 
+import cherrypy
 @app.route("/api/cyclopedias", methods=["GET"])
 @require_apikey
 def get_cyclopedia():
@@ -143,7 +144,15 @@ def get_cyclopedia():
         cyclopedias_presenter = CyclopediaPresenter(many=True)
         cyclopedias_result = cyclopedias_presenter.dump(cyclopedias)
 
-        return jsonify(cyclopedias_result.data)
+        entry_service = EntryService()
+
+        entries = entry_service.get_root_entries(g.user.id)
+
+        entries_presenter = EntryPresenter(many=True)
+        entries_result = entries_presenter.dump(entries)
+
+        return jsonify({"cyclopedias": cyclopedias_result.data,
+                        "entries": entries_result.data})
 
 
 @app.route("/api/entries/create", methods=["POST"])

@@ -98,6 +98,6 @@ class CyclopediaService(object):
         cyclopedias = db.session.query(Cyclopedia).filter(and_(
             Cyclopedia.user_id == user_id,
             Cyclopedia.parent_cyclopedia_id == None,
-        ))
+        )).all()
 
         return cyclopedias

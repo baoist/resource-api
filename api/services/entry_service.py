@@ -57,6 +57,6 @@ class EntryService(object):
         entries = db.session.query(Entry).filter(and_(
             Entry.user_id == user_id,
             Entry.cyclopedia_id == None,
-        ))
+        )).all()
 
         return entries

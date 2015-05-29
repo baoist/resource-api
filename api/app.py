@@ -115,7 +115,6 @@ def create_cyclopedia():
                     mimetype="application/json")
 
 
-import cherrypy
 @app.route("/api/cyclopedias", methods=["GET"])
 @require_apikey
 def get_cyclopedia():
@@ -126,11 +125,11 @@ def get_cyclopedia():
     Retrieves the tree of cyclopedias and entries.
     If a `path` is passed the subtree beginning at that descendent.
     '''
-    cyclopedia_params = request.get_json(force=True)
+    cyclopedia_params = request.get_json(force=True, silent=True)
 
     cyclopedia_service = CyclopediaService()
 
-    if cyclopedia_params.get('path', False):
+    if cyclopedia_params and cyclopedia_params.get('path', False):
         node_topic_id = cyclopedia_service.get_parent_node_id(cyclopedia_params.get('path'))
         cyclopedia = cyclopedia_service.find(node_topic_id)
 

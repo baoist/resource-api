@@ -52,11 +52,11 @@ def require_apikey(fn):
 
 @app.route("/api/users/create", methods=["POST"])
 def create_user():
-    '''
+    """
     Receives a username:password (required) and attempts to create a user.
 
     Username is a unique field.
-    '''
+    """
     auth = request.authorization
 
     user_service = UserService()
@@ -76,9 +76,9 @@ def create_user():
 
 @app.route("/api/log-in", methods=["POST"])
 def login():
-    '''
+    """
     Receives a username:password and attempts to log in.
-    '''
+    """
     auth = request.authorization
 
     authenticator = AuthenticationService(auth.username, auth.password)
@@ -100,13 +100,13 @@ def login():
 @app.route("/api/cyclopedias/create", methods=["POST"])
 @require_apikey
 def create_cyclopedia():
-    '''
+    """
     Receives:
     `topic` (required, string)
     `path` (optional, array)
 
     Attempts to create a cyclopedia.
-    '''
+    """
     cyclopedia_params = request.get_json(force=True)
 
     if cyclopedia_params.get('topic', False):
@@ -129,13 +129,13 @@ def create_cyclopedia():
 @app.route("/api/cyclopedias", methods=["GET"])
 @require_apikey
 def get_cyclopedia():
-    '''
+    """
     Receives:
     `path` (optional, array)
 
     Retrieves the tree of cyclopedias and entries.
     If a `path` is passed the subtree beginning at that descendent.
-    '''
+    """
     cyclopedia_params = request.get_json(force=True, silent=True)
 
     cyclopedia_service = CyclopediaService()
@@ -168,7 +168,7 @@ def get_cyclopedia():
 @app.route("/api/entries/create", methods=["POST"])
 @require_apikey
 def create_entry():
-    '''
+    """
     Receives:
     `term` (required, string)
     `title` (optional, string)
@@ -177,7 +177,7 @@ def create_entry():
     `path` (optional, array)
 
     Attempts to create an entry. Path indicates tree of cyclopedias.
-    '''
+    """
     entry_params = request.get_json(force=True)
 
     if entry_params.get('term', False):
@@ -198,6 +198,7 @@ def create_entry():
     return Response(response='400 Unable to create entry.',
                     status=400,
                     mimetype="application/json")
+
 
 
 if __name__ == "__main__":

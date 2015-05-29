@@ -8,9 +8,11 @@ from models.cyclopedia import Cyclopedia
 from models.entry import Entry
 from services.cyclopedia_service import CyclopediaService
 from services.user_service import UserService
+from services.entry_service import EntryService
 from services.authentication_service import AuthenticationService
 from presenters.user_presenter import UserPresenter
 from presenters.cyclopedia_presenter import CyclopediaPresenter
+from presenters.entry_presenter import EntryPresenter
 
 import config
 
@@ -88,7 +90,9 @@ def login():
 @require_apikey
 def create_cyclopedia():
     '''
-    Receives a `topic` (required), `path` (optional).
+    Receives:
+    `topic` (required, string)
+    `path` (optional, array)
 
     Attempts to create a cyclopedia.
     '''
@@ -115,7 +119,8 @@ def create_cyclopedia():
 @require_apikey
 def get_cyclopedia():
     '''
-    Receives `path` (optional, array).
+    Receives:
+    `path` (optional, array)
 
     Retrieves the tree of cyclopedias and entries.
     If a `path` is passed the subtree beginning at that descendent.
@@ -139,6 +144,41 @@ def get_cyclopedia():
         cyclopedias_result = cyclopedias_presenter.dump(cyclopedias)
 
         return jsonify(cyclopedias_result.data)
+
+
+@app.route("/api/entries/create", methods=["POST"])
+@require_apikey
+def create_entry():
+    '''
+    Receives:
+    `term` (required, string)
+    `title` (optional, string)
+    `image_url` (optional, string)
+    `description` (optional, string)
+    `path` (optional, array)
+
+    Attempts to create an entry. Path indicates tree of cyclopedias.
+    '''
+    entry_params = request.get_json(force=True)
+
+    if entry_params.get('term', False):
+        entry_service = EntryService()
+        entry = entry_service.create(entry_params.get('term'),
+                                     g.user,
+                                     entry_params.get('title', entry_params.get('term')),
+                                     entry_params.get('image_url', None),
+                                     entry_params.get('description', None),
+                                     entry_params.get('path', None))
+
+        if entry:
+            entry_presenter = EntryPresenter()
+            entry_result = entry_presenter.dump(entry)
+
+            return jsonify(entry_result.data)
+
+    return Response(response='400 Unable to create entry.',
+                    status=400,
+                    mimetype="application/json")
 
 
 if __name__ == "__main__":

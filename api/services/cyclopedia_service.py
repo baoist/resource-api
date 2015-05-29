@@ -15,8 +15,6 @@ class CyclopediaService(object):
         Returns record if successful,
         otherwise returns False
 
-        Receives a `topic` (required), `user` (required), `nodes` (optional)
-
         Record will be created as a child of the last node if passed,
         otherwise it will be at the root
         '''
@@ -99,7 +97,7 @@ class CyclopediaService(object):
         '''
         cyclopedias = db.session.query(Cyclopedia).filter(and_(
             Cyclopedia.user_id == user_id,
-            Cyclopedia.node_cyclopedia_id == None,
+            Cyclopedia.parent_cyclopedia_id == None,
         ))
 
         return cyclopedias

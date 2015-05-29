@@ -1,5 +1,5 @@
 from marshmallow import Schema, fields
-#from presenters.entries_presenter import EntriesPresenter
+from presenters.entry_presenter import EntryPresenter
 
 
 class CyclopediaPresenter(Schema):
@@ -7,3 +7,4 @@ class CyclopediaPresenter(Schema):
     parent_cyclopedia_id = fields.Int(default=None)
     topic = fields.Str()
     cyclopedias = fields.Nested('self', many=True, default=None)
+    entries = fields.Nested(EntryPresenter, many=True, default=None)

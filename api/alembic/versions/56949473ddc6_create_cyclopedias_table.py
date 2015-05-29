@@ -22,7 +22,7 @@ def upgrade():
         'cyclopedias',
         sa.Column('id', sa.Integer, primary_key=True),
         sa.Column('topic', sa.String(255), index=True, nullable=False),
-        sa.Column('user_id', sa.Integer, sa.ForeignKey('users.id'), nullable=True),
+        sa.Column('user_id', sa.Integer, sa.ForeignKey('users.id'), nullable=False),
         sa.Column('parent_cyclopedia_id', sa.Integer, sa.ForeignKey('cyclopedias.id'), nullable=True),
         sa.Column('created_at', sa.DateTime(), nullable=False),
         sa.Column('updated_at', sa.DateTime()),

@@ -14,6 +14,7 @@ class Cyclopedia(db.Model, DictSerializableMixin):
     user_id = db.Column(db.Integer, ForeignKey('users.id'))
     parent_cyclopedia_id = db.Column(db.Integer, ForeignKey('cyclopedias.id'))
     cyclopedias = relationship("Cyclopedia")
+    entries = relationship("Entry")
     created_at = db.Column(db.DateTime)
     updated_at = db.Column(db.DateTime)
 

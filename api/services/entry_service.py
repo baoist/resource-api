@@ -12,7 +12,7 @@ class EntryService(object):
 
 
     def create(self, term, user, title, image_url=None, description=None, nodes=None):
-        '''
+        """
         Attempt to create a record
 
         Returns record if successful,
@@ -20,11 +20,11 @@ class EntryService(object):
 
         Record will be created as a child of the last node if passed,
         otherwise it will be at the root
-        '''
+        """
         if not nodes:
             parent_node = self.cyclopedia_service.get_root_node(user)
         else:
-            parent_node = self.cyclopedia_service.get_parent_node_by_topic_path(nodes)
+            parent_node = self.cyclopedia_service.get_parent_node_by_topic_path(user, nodes)
             if nodes and not parent_node:
                 return False
 
@@ -42,9 +42,9 @@ class EntryService(object):
         return entry
 
     def terms_at_level(self, term, user_id, id=None, node_id=None):
-        '''
+        """
         Retrieves all records at level given params
-        '''
+        """
         entries = db.session.query(Entry).filter(and_(
             Entry.term == term,
             Entry.user_id == user_id,
@@ -56,9 +56,9 @@ class EntryService(object):
 
 
     def get_root_entries(self, user_id):
-        '''
+        """
         Retreive all root nodes
-        '''
+        """
         entries = db.session.query(Entry).filter(and_(
             Entry.user_id == user_id,
             Entry.cyclopedia_id == None,

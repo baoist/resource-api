@@ -9,7 +9,7 @@ class CyclopediaService(object):
 
 
     def create(self, topic, user, nodes=None):
-        '''
+        """
         Attempt to create a record
 
         Returns record if successful,
@@ -17,11 +17,11 @@ class CyclopediaService(object):
 
         Record will be created as a child of the last node if passed,
         otherwise it will be at the root
-        '''
+        """
         if nodes:
             # new record should be created as a
             # child of the last node in nodes
-            parent_node = self.get_parent_node_by_topic_path(nodes)
+            parent_node = self.get_parent_node_by_topic_path(user, nodes)
 
             if not parent_node:
                 return False
@@ -69,19 +69,19 @@ class CyclopediaService(object):
 
 
     def find(self, id):
-        '''
+        """
         Retrieve a single record given `id`
-        '''
+        """
         cyclopedia = Cyclopedia.query.filter_by(id = id).first()
 
         return cyclopedia
 
 
     def topics_at_level(self, topic, user_id, id=None, node_id=None):
-        '''
+        """
         Retrieves all records given
         topic, user_id, id (optional), node_id (optional)
-        '''
+        """
         cyclopedias = db.session.query(Cyclopedia).filter(and_(
             Cyclopedia.topic == topic,
             Cyclopedia.user_id == user_id,
@@ -91,15 +91,15 @@ class CyclopediaService(object):
 
         return cyclopedias
 
-    def get_parent_node_by_topic_path(self, node_topics=None):
-        '''
+    def get_parent_node_by_topic_path(self, user, node_topics=None):
+        """
         Retreive all node records in a path
-        '''
+        """
         if not node_topics:
             return None
 
         nodes = []
-        previous = None
+        previous = self.get_root_node(user)
         for iter, topic in enumerate(node_topics):
             node = Cyclopedia.query.filter(and_(
                 Cyclopedia.topic == topic,
@@ -115,13 +115,13 @@ class CyclopediaService(object):
         return nodes[-1]
 
 
-    def get_root_cyclopedias(self, user_id):
-        '''
+    def get_root_cyclopedia(self, user_id):
+        """
         Retreive all root nodes
-        '''
+        """
         cyclopedias = db.session.query(Cyclopedia).filter(and_(
             Cyclopedia.user_id == user_id,
             Cyclopedia.parent_cyclopedia_id == None,
-        )).all()
+        )).first()
 
         return cyclopedias

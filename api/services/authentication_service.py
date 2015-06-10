@@ -21,6 +21,7 @@ class AuthenticationService():
         user = User.query.filter_by(username = self.username).first()
         if not user or not user.verify_password(self.password):
             return False
+
         return user
 
 
@@ -28,4 +29,5 @@ class AuthenticationService():
         user = User.query.filter_by(auth_token = self.token).first()
         if not user:
             return False
+
         return user

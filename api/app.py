@@ -149,20 +149,12 @@ def get_cyclopedia():
 
         return jsonify(cyclopedias_result.data)
     else:
-        cyclopedias = cyclopedia_service.get_root_cyclopedias(g.user.id)
+        cyclopedia = cyclopedia_service.get_root_cyclopedia(g.user.id)
 
-        cyclopedias_presenter = CyclopediaPresenter(many=True)
-        cyclopedias_result = cyclopedias_presenter.dump(cyclopedias)
+        cyclopedias_presenter = CyclopediaPresenter()
+        cyclopedias_result = cyclopedias_presenter.dump(cyclopedia)
 
-        entry_service = EntryService()
-
-        entries = entry_service.get_root_entries(g.user.id)
-
-        entries_presenter = EntryPresenter(many=True)
-        entries_result = entries_presenter.dump(entries)
-
-        return jsonify({"cyclopedias": cyclopedias_result.data,
-                        "entries": entries_result.data})
+        return jsonify(cyclopedias_result.data)
 
 
 @app.route("/api/entries/create", methods=["POST"])

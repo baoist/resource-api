@@ -20,13 +20,13 @@ class EntryService(object):
         otherwise returns False
 
         Record will be created as a child of the last node if passed,
-        otherwise it will be at the root
+        otherwise it will be at the root node
         """
         if not nodes:
             parent_node = self.cyclopedia_service.get_root_node(user)
         else:
             parent_node = self.cyclopedia_service.get_parent_node_by_topic_path(user, nodes)
-            if nodes and not parent_node:
+            if not parent_node:
                 return False
 
         parent_node_id = getattr(parent_node, 'id', None)
@@ -60,6 +60,7 @@ class EntryService(object):
         """
         Retreive all root nodes
         """
+        # TODO: set Entry.cyclopedia_id to Cyclopedia root node id
         entries = db.session.query(Entry).filter(and_(
             Entry.user_id == user_id,
             Entry.cyclopedia_id == None,

@@ -18,12 +18,28 @@ class CyclopediaService(object):
         Record will be created as a child of the last node if passed,
         otherwise it will be at the root
         '''
-        parent_node_id = self.get_parent_node_id(nodes)
-        if nodes and not parent_node_id:
+        if nodes:
+            # new record should be created as a
+            # child of the last node in nodes
+            parent_node = self.get_parent_node_by_topic_path(nodes)
+
+            if not parent_node:
+                return False
+
+        else:
+            # default to root node
+            parent_node = self.get_root_node()
+
+            if not parent_node:
+                # create root node if not yet existing
+                parent_node = self.create_root_node()
+
+        parent_node_id = getattr(parent_node, 'id', None)
+        if not parent_node_id:
             return False
 
-        topics_at_level = self.topics_at_level(topic, user.id, None, parent_node_id).count()
-        if topics_at_level > 0:
+        topics_at_level = self.topics_at_level(topic, user.id, None, parent_node_id).scalar()
+        if topics_at_level:
             return False
 
         cyclopedia = Cyclopedia(topic, user.id, parent_node_id)
@@ -32,6 +48,24 @@ class CyclopediaService(object):
         db.session.commit()
 
         return cyclopedia
+
+
+    def get_root_node(self, user):
+        node = Cyclopedia.query.filter(and_(
+            Cyclopedia.user_id == user.id,
+            Cyclopedia.parent_cyclopedia_id == None,
+        )).first()
+
+        return node
+
+
+    def create_root_node(self, user):
+        node = Cyclopedia("Root Cyclopedia", user.id, None)
+
+        db.session.add(node)
+        db.session.commit()
+
+        return node
 
 
     def find(self, id):
@@ -57,17 +91,7 @@ class CyclopediaService(object):
 
         return cyclopedias
 
-
-    def get_parent_node_id(self, node_topics=None):
-        '''
-        Retreive the id of the last record in a path
-        given a path of `topics`
-        '''
-        nearest_topic = self.get_parent_node(node_topics)
-
-        return getattr(nearest_topic, 'id', None)
-
-    def get_parent_node(self, node_topics=None):
+    def get_parent_node_by_topic_path(self, node_topics=None):
         '''
         Retreive all node records in a path
         '''

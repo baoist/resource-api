@@ -21,9 +21,14 @@ class EntryService(object):
         Record will be created as a child of the last node if passed,
         otherwise it will be at the root
         '''
-        parent_node_id = self.cyclopedia_service.get_parent_node_id(nodes)
-        if nodes and not parent_node_id:
-            return False
+        if not nodes:
+            parent_node = self.cyclopedia_service.get_root_node(user)
+        else:
+            parent_node = self.cyclopedia_service.get_parent_node_by_topic_path(nodes)
+            if nodes and not parent_node:
+                return False
+
+        parent_node_id = getattr(parent_node, 'id', None)
 
         terms_at_level = self.terms_at_level(term, user.id, None, parent_node_id).count()
         if terms_at_level > 0:

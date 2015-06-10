@@ -1,5 +1,6 @@
 from models.base import db
 from models.user import User
+from services.cyclopedia_service import CyclopediaService
 
 
 class UserService(object):

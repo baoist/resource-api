@@ -53,7 +53,7 @@ def require_apikey(fn):
 @app.route("/api/users/create", methods=["POST"])
 def create_user():
     """
-    Receives a username:password (required) and attempts to create a user.
+    Params a username:password (required) and attempts to create a user.
 
     Username is a unique field.
     """
@@ -77,7 +77,7 @@ def create_user():
 @app.route("/api/log-in", methods=["POST"])
 def login():
     """
-    Receives a username:password and attempts to log in.
+    Params a username:password and attempts to log in.
     """
     auth = request.authorization
 
@@ -101,16 +101,16 @@ def login():
 @require_apikey
 def create_cyclopedia():
     """
-    Receives:
+    Params:
     `topic` (required, string)
     `path` (optional, array)
 
     Attempts to create a cyclopedia.
     """
     cyclopedia_params = request.get_json(force=True)
+    cyclopedia_service = CyclopediaService()
 
     if cyclopedia_params.get('topic', False):
-        cyclopedia_service = CyclopediaService()
         cyclopedia = cyclopedia_service.create(cyclopedia_params.get('topic'),
                                                g.user,
                                                cyclopedia_params.get('path', ""))
@@ -130,7 +130,7 @@ def create_cyclopedia():
 @require_apikey
 def get_cyclopedia():
     """
-    Receives:
+    Params:
     `path` (optional, array)
 
     Retrieves the tree of cyclopedias and entries.
@@ -169,7 +169,7 @@ def get_cyclopedia():
 @require_apikey
 def create_entry():
     """
-    Receives:
+    Params:
     `term` (required, string)
     `title` (optional, string)
     `image_url` (optional, string)

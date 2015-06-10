@@ -28,7 +28,7 @@ class CyclopediaService(object):
 
         else:
             # default to root node
-            parent_node = self.get_root_node()
+            parent_node = self.get_root_node(user)
 
             if not parent_node:
                 # create root node if not yet existing

@@ -192,6 +192,40 @@ def create_entry():
                     mimetype="application/json")
 
 
+@app.route("/api/entries/<path:entry_id>", methods=["GET"])
+@require_apikey
+def get_entry(entry_id):
+    entry_service = EntryService()
+    entry = entry_service.find(g.user.id, entryid)
+
+    if entry:
+        entry_presenter = EntryPresenter()
+        entry_result = entry_presenter.dump(entry)
+
+        return jsonify(entry_result.data)
+
+    return Response(response='400 Unable to find entry.',
+                status=400,
+                mimetype="application/json")
+
+
+
+@app.route("/api/entries/<path:entryid>", methods=["DELETE"])
+@require_apikey
+def delete_entry(entryid):
+    entry_service = EntryService()
+    entry = entry_service.find(g.user.id, entryid)
+
+    if entry:
+        entry_service.destroy(entry)
+
+        return Response(response='200 Successfully deleted entry %s.' % entry.id,
+                    status=200,
+                    mimetype="application/json")
+
+    return Response(response='400 Unable to find entry.',
+                status=400,
+                mimetype="application/json")
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True)

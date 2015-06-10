@@ -7,6 +7,7 @@ from services.cyclopedia_service import CyclopediaService
 class EntryService(object):
     cyclopedia_service = CyclopediaService()
 
+
     def init():
         pass
 
@@ -65,3 +66,23 @@ class EntryService(object):
         )).all()
 
         return entries
+
+    def find(self, user_id, id):
+        """
+        Retrieve a single record given `user_id` and `id`
+        """
+        entry = db.session.query(Entry).filter(and_(
+            Entry.user_id == user_id,
+            Entry.id == id,
+        )).first()
+
+        return entry
+
+    def destroy(self, entry):
+        """
+        Destroy a single record given `entry`
+        """
+        db.session.delete(entry)
+        db.session.commit()
+
+        return True

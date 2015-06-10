@@ -6,6 +6,8 @@ from base import db
 
 import app
 
+# TODO: Add URL
+
 class Entry(db.Model, DictSerializableMixin):
     __tablename__ = 'entries'
 

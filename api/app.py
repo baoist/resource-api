@@ -1,11 +1,7 @@
 from functools import wraps
-from flask import (g, request, Response, redirect,
-                  url_for, Flask, jsonify, json)
+from flask import (g, request, Response, Flask, jsonify)
 from flask.ext.httpauth import HTTPBasicAuth
 from models.base import db
-from models.user import User
-from models.cyclopedia import Cyclopedia
-from models.entry import Entry
 from services.cyclopedia_service import CyclopediaService
 from services.user_service import UserService
 from services.entry_service import EntryService
@@ -13,8 +9,6 @@ from services.authentication_service import AuthenticationService
 from presenters.user_presenter import UserPresenter
 from presenters.cyclopedia_presenter import CyclopediaPresenter
 from presenters.entry_presenter import EntryPresenter
-
-import config
 
 app = Flask(__name__)
 app.config.from_object('config.DevelopmentConfig')
@@ -42,8 +36,8 @@ def require_apikey(fn):
 
         if not auth.username or not user:
             return Response(response='401 Unauthorized.',
-                        status=401,
-                        mimetype="application/json")
+                            status=401,
+                            mimetype="application/json")
 
         g.user = user
         return fn(*args, **kwargs)
@@ -67,7 +61,6 @@ def create_user():
         user_result = user_presenter.dump(created_user)
 
         return jsonify(user_result.data)
-
 
     return Response(response='400 Unable to create user. User already exists.',
                     status=400,
@@ -196,7 +189,7 @@ def create_entry():
 @require_apikey
 def get_entry(entry_id):
     entry_service = EntryService()
-    entry = entry_service.find(g.user.id, entryid)
+    entry = entry_service.find(g.user.id, entry_id)
 
     if entry:
         entry_presenter = EntryPresenter()
@@ -205,9 +198,8 @@ def get_entry(entry_id):
         return jsonify(entry_result.data)
 
     return Response(response='400 Unable to find entry.',
-                status=400,
-                mimetype="application/json")
-
+                    status=400,
+                    mimetype="application/json")
 
 
 @app.route("/api/entries/<path:entryid>", methods=["DELETE"])
@@ -220,12 +212,12 @@ def delete_entry(entryid):
         entry_service.destroy(entry)
 
         return Response(response='200 Successfully deleted entry %s.' % entry.id,
-                    status=200,
-                    mimetype="application/json")
+                        status=200,
+                        mimetype="application/json")
 
     return Response(response='400 Unable to find entry.',
-                status=400,
-                mimetype="application/json")
+                    status=400,
+                    mimetype="application/json")
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True)

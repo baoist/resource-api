@@ -32,7 +32,7 @@ class CyclopediaService(object):
 
             if not parent_node:
                 # create root node if not yet existing
-                parent_node = self.create_root_node()
+                parent_node = self.create_root_node(user)
 
         parent_node_id = getattr(parent_node, 'id', None)
         if not parent_node_id:

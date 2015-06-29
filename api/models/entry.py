@@ -1,10 +1,7 @@
 from datetime import datetime
-from sqlalchemy.orm import relationship
-from sqlalchemy import Column, types, ForeignKey
+from sqlalchemy import Column, ForeignKey
 from models.mixins.dict_serializable_mixin import DictSerializableMixin
 from base import db
-
-import app
 
 # TODO: Add URL
 

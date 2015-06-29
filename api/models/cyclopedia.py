@@ -1,10 +1,8 @@
 from datetime import datetime
-from sqlalchemy.orm import relationship, validates
-from sqlalchemy import Column, types, ForeignKey
+from sqlalchemy.orm import relationship
+from sqlalchemy import Column, ForeignKey
 from models.mixins.dict_serializable_mixin import DictSerializableMixin
 from base import db
-
-import app
 
 class Cyclopedia(db.Model, DictSerializableMixin):
     __tablename__ = 'cyclopedias'
@@ -17,7 +15,6 @@ class Cyclopedia(db.Model, DictSerializableMixin):
     entries = relationship("Entry")
     created_at = db.Column(db.DateTime)
     updated_at = db.Column(db.DateTime)
-
 
     def __init__(self, topic, user_id, parent_cyclopedia_id=None):
         self.topic = topic

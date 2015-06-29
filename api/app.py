@@ -1,11 +1,7 @@
 from functools import wraps
-from flask import (g, request, Response, redirect,
-                  url_for, Flask, jsonify, json)
+from flask import (g, request, Response, Flask, jsonify)
 from flask.ext.httpauth import HTTPBasicAuth
 from models.base import db
-from models.user import User
-from models.cyclopedia import Cyclopedia
-from models.entry import Entry
 from services.cyclopedia_service import CyclopediaService
 from services.user_service import UserService
 from services.entry_service import EntryService
@@ -13,8 +9,6 @@ from services.authentication_service import AuthenticationService
 from presenters.user_presenter import UserPresenter
 from presenters.cyclopedia_presenter import CyclopediaPresenter
 from presenters.entry_presenter import EntryPresenter
-
-import config
 
 app = Flask(__name__)
 app.config.from_object('config.DevelopmentConfig')
@@ -42,8 +36,8 @@ def require_apikey(fn):
 
         if not auth.username or not user:
             return Response(response='401 Unauthorized.',
-                        status=401,
-                        mimetype="application/json")
+                            status=401,
+                            mimetype="application/json")
 
         g.user = user
         return fn(*args, **kwargs)
@@ -53,7 +47,7 @@ def require_apikey(fn):
 @app.route("/api/users/create", methods=["POST"])
 def create_user():
     """
-    Receives a username:password (required) and attempts to create a user.
+    Params a username:password (required) and attempts to create a user.
 
     Username is a unique field.
     """
@@ -68,7 +62,6 @@ def create_user():
 
         return jsonify(user_result.data)
 
-
     return Response(response='400 Unable to create user. User already exists.',
                     status=400,
                     mimetype="application/json")
@@ -77,7 +70,7 @@ def create_user():
 @app.route("/api/log-in", methods=["POST"])
 def login():
     """
-    Receives a username:password and attempts to log in.
+    Params a username:password and attempts to log in.
     """
     auth = request.authorization
 
@@ -101,16 +94,16 @@ def login():
 @require_apikey
 def create_cyclopedia():
     """
-    Receives:
+    Params:
     `topic` (required, string)
     `path` (optional, array)
 
     Attempts to create a cyclopedia.
     """
     cyclopedia_params = request.get_json(force=True)
+    cyclopedia_service = CyclopediaService()
 
     if cyclopedia_params.get('topic', False):
-        cyclopedia_service = CyclopediaService()
         cyclopedia = cyclopedia_service.create(cyclopedia_params.get('topic'),
                                                g.user,
                                                cyclopedia_params.get('path', ""))
@@ -130,7 +123,7 @@ def create_cyclopedia():
 @require_apikey
 def get_cyclopedia():
     """
-    Receives:
+    Params:
     `path` (optional, array)
 
     Retrieves the tree of cyclopedias and entries.
@@ -149,27 +142,19 @@ def get_cyclopedia():
 
         return jsonify(cyclopedias_result.data)
     else:
-        cyclopedias = cyclopedia_service.get_root_cyclopedias(g.user.id)
+        cyclopedia = cyclopedia_service.get_root_cyclopedia(g.user.id)
 
-        cyclopedias_presenter = CyclopediaPresenter(many=True)
-        cyclopedias_result = cyclopedias_presenter.dump(cyclopedias)
+        cyclopedias_presenter = CyclopediaPresenter()
+        cyclopedias_result = cyclopedias_presenter.dump(cyclopedia)
 
-        entry_service = EntryService()
-
-        entries = entry_service.get_root_entries(g.user.id)
-
-        entries_presenter = EntryPresenter(many=True)
-        entries_result = entries_presenter.dump(entries)
-
-        return jsonify({"cyclopedias": cyclopedias_result.data,
-                        "entries": entries_result.data})
+        return jsonify(cyclopedias_result.data)
 
 
 @app.route("/api/entries/create", methods=["POST"])
 @require_apikey
 def create_entry():
     """
-    Receives:
+    Params:
     `term` (required, string)
     `title` (optional, string)
     `image_url` (optional, string)
@@ -200,6 +185,39 @@ def create_entry():
                     mimetype="application/json")
 
 
+@app.route("/api/entries/<path:entry_id>", methods=["GET"])
+@require_apikey
+def get_entry(entry_id):
+    entry_service = EntryService()
+    entry = entry_service.find(g.user.id, entry_id)
+
+    if entry:
+        entry_presenter = EntryPresenter()
+        entry_result = entry_presenter.dump(entry)
+
+        return jsonify(entry_result.data)
+
+    return Response(response='400 Unable to find entry.',
+                    status=400,
+                    mimetype="application/json")
+
+
+@app.route("/api/entries/<path:entryid>", methods=["DELETE"])
+@require_apikey
+def delete_entry(entryid):
+    entry_service = EntryService()
+    entry = entry_service.find(g.user.id, entryid)
+
+    if entry:
+        entry_service.destroy(entry)
+
+        return Response(response='200 Successfully deleted entry %s.' % entry.id,
+                        status=200,
+                        mimetype="application/json")
+
+    return Response(response='400 Unable to find entry.',
+                    status=400,
+                    mimetype="application/json")
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True)

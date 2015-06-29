@@ -68,7 +68,7 @@ class CyclopediaService(object):
         """
         Retrieve a single record given `id`
         """
-        cyclopedia = Cyclopedia.query.filter_by(id == id).first()
+        cyclopedia = Cyclopedia.query.filter(Cyclopedia.id == id).first()
 
         return cyclopedia
 

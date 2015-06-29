@@ -7,7 +7,6 @@ class CyclopediaService(object):
     def init():
         pass
 
-
     def create(self, topic, user, nodes=None):
         """
         Attempt to create a record
@@ -49,15 +48,13 @@ class CyclopediaService(object):
 
         return cyclopedia
 
-
     def get_root_node(self, user):
         node = Cyclopedia.query.filter(and_(
             Cyclopedia.user_id == user.id,
-            Cyclopedia.parent_cyclopedia_id == None,
+            Cyclopedia.parent_cyclopedia_id.is_(None),
         )).first()
 
         return node
-
 
     def create_root_node(self, user):
         node = Cyclopedia("Root Cyclopedia", user.id, None)
@@ -67,15 +64,13 @@ class CyclopediaService(object):
 
         return node
 
-
     def find(self, id):
         """
         Retrieve a single record given `id`
         """
-        cyclopedia = Cyclopedia.query.filter_by(id = id).first()
+        cyclopedia = Cyclopedia.query.filter_by(id == id).first()
 
         return cyclopedia
-
 
     def topics_at_level(self, topic, user_id, id=None, node_id=None):
         """
@@ -114,14 +109,13 @@ class CyclopediaService(object):
 
         return nodes[-1]
 
-
     def get_root_cyclopedia(self, user_id):
         """
         Retreive all root nodes
         """
         cyclopedias = db.session.query(Cyclopedia).filter(and_(
             Cyclopedia.user_id == user_id,
-            Cyclopedia.parent_cyclopedia_id == None,
+            Cyclopedia.parent_cyclopedia_id.is_(None),
         )).first()
 
         return cyclopedias

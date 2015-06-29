@@ -7,12 +7,11 @@ from services.cyclopedia_service import CyclopediaService
 class EntryService(object):
     cyclopedia_service = CyclopediaService()
 
-
     def init():
         pass
 
-
-    def create(self, term, user, title, image_url=None, description=None, nodes=None):
+    def create(self, term, user, title,
+               image_url=None, description=None, nodes=None):
         """
         Attempt to create a record
 
@@ -55,7 +54,6 @@ class EntryService(object):
 
         return entries
 
-
     def get_root_entries(self, user_id):
         """
         Retreive all root nodes
@@ -63,7 +61,7 @@ class EntryService(object):
         # TODO: set Entry.cyclopedia_id to Cyclopedia root node id
         entries = db.session.query(Entry).filter(and_(
             Entry.user_id == user_id,
-            Entry.cyclopedia_id == None,
+            Entry.cyclopedia_id.is_(None),
         )).all()
 
         return entries
